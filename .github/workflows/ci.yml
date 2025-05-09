@@ -3,17 +3,14 @@ name: Build TI‑84 CE Program
 on:
   push:
     branches:
-      - main   # or the branch you work on
+      - main
   pull_request:
 
 jobs:
   build:
-    # Use CEdev’s prebuilt image with ez80‑clang, ez80‑link, etc.
+    runs-on: ubuntu-latest
     container:
       image: ghcr.io/ce-programming/cedev:latest
-    workspace:
-      # ensure the workspace root is mounted in the container
-      path: /github/workspace
 
     steps:
       - name: Checkout code
@@ -21,17 +18,16 @@ jobs:
 
       - name: Show toolchain version
         run: |
-          echo "CEDEV install path: $(cedev-config --prefix)"
+          echo "CEDEV prefix: $(cedev-config --prefix)"
           ez80-clang --version
           ez80-link --version
 
       - name: Build .8xp
         run: |
-          cd /github/workspace
           make clean
           make
 
-      - name: Upload TI‑84 CE artifact
+      - name: Upload TI‑84 CE artifact
         uses: actions/upload-artifact@v3
         with:
           name: passwordlock.8xp
